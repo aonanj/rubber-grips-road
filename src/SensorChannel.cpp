@@ -1,13 +1,11 @@
 #include "SensorChannel.h"
 
 #include <algorithm>
-#include <optional>
 
-SensorChannel::SensorChannel(std::string name, SensorConfig config)
-    : name_(std::move(name)), config_(config), nextUpdate_(std::chrono::steady_clock::time_point::min()) {}
+SensorChannel::SensorChannel(const char* name, SensorConfig config)
+    : name_(name), config_(config), nextUpdateMs_(0) {}
 
-std::optional<double> SensorChannel::ingest(
-    double sampleF, std::chrono::steady_clock::time_point now) {
+std::optional<double> SensorChannel::ingest(double sampleF, uint32_t nowMs) {
     if (isOutlier(sampleF)) {
         return std::nullopt;
     }
@@ -15,11 +13,12 @@ std::optional<double> SensorChannel::ingest(
     const double smoothed = smooth(sampleF);
     smoothedValue_ = smoothed;
 
-    if (now < nextUpdate_) {
+    const int32_t timeToNextUpdate = static_cast<int32_t>(nowMs - nextUpdateMs_);
+    if (timeToNextUpdate < 0) {
         return std::nullopt;
     }
 
-    nextUpdate_ = now + config_.updatePeriod;
+    nextUpdateMs_ = nowMs + config_.updatePeriodMs;
     return smoothedValue_;
 }
 
