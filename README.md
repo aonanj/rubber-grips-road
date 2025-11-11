@@ -1,4 +1,4 @@
-# Tire Temperature Monitor (C++)
+# Rubber Grips Road (C++)
 
 _embedded-style logic for a motorcycle front tire infrared sensor, ambient temperature sensor, and color LCD display_
 

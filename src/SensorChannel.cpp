@@ -1,6 +1,7 @@
 #include "SensorChannel.h"
 
 #include <algorithm>
+#include <optional>
 
 SensorChannel::SensorChannel(std::string name, SensorConfig config)
     : name_(std::move(name)), config_(config), nextUpdate_(std::chrono::steady_clock::time_point::min()) {}
@@ -11,7 +12,8 @@ std::optional<double> SensorChannel::ingest(
         return std::nullopt;
     }
 
-    smoothedValue_ = smooth(sampleF);
+    const double smoothed = smooth(sampleF);
+    smoothedValue_ = smoothed;
 
     if (now < nextUpdate_) {
         return std::nullopt;
