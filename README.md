@@ -36,6 +36,8 @@ Key logic lives in:
 - `SensorChannel` — filtering, smoothing, and update-period management.
 - `Display` — wraps an Adafruit ST77xx display over hardware SPI.
 - `src/main.cpp` — Arduino `setup/loop`, real sensor drivers, and thresholds.
+    - Smoothing constants and thresholds are configurable via `src/main.cpp` to fit
+  different tire compounds and environments. 
 
 ## Required Arduino Libraries
 
@@ -66,7 +68,16 @@ any time one of the channels produces a new filtered value.
 
 - If either sensor fails to initialize, the firmware halts and prints an error
   over Serial so the issue is obvious during bench testing.
-- The BME280 is probed at addresses `0x76` and `0x77`; adjust in `src/main.cpp`
-  if your breakout uses something custom.
-- Adjust the smoothing constants or thresholds directly in `src/main.cpp` to fit
-  your tire compound or environmental testing.
+- The BME280 is probed at addresses `0x76` and `0x77`; adjustable via `src/main.cpp`
+  for custom breakouts.
+
+## License
+
+This repository is publicly viewable for portfolio purposes only. The code is proprietary.
+Copyright © 2025 Phaethon Order LLC. All rights reserved.
+Contact [support@phaethon.llc](mailto:support@phaethon.llc) for licensing or reuse requests.
+
+See [LICENSE](LICENSE)
+
+## Contact
+Questions or support: [support@phaethon.llc](mailto:support@phaethon.llc).
