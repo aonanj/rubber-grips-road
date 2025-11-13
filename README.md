@@ -1,11 +1,45 @@
-# Rubber Grips Road (Arduino Nano Every)
-
-Embedded firmware for the Rubber Grips Road accessory. The sketch targets the
+# Rubber Grips Road
+Embedded firmware for the Rubber Grips Road motorcycle accessory. The sketch targets the
 Arduino Nano Every and drives:
-
 - A MLX90614 infrared sensor for front-tire surface temperature (I²C on A4/A5).
 - A BME280 for ambient temperature (shares the I²C bus).
 - An SPI color LCD (Adafruit ST77xx-compatible) showing color-coded status lines.
+
+## Prototype Description
+* **Goal**: Provide a motorcycle operator with continuously updated information about tire surface temperature and lean angle safety. 
+* Accessory composed of 4 major components: (1) an infrared temperature sensor, (2) an ambient temperature sensor, (3) an Arduino microcontroller, (4) a color LCD display. 
+  * The infrared temperature sensor is mounted in a position proximate to the radiator guard, and directed to the front tire of the motorcycle in order to detect the surface temperature of the front tire. 
+  * The ambient temperature sensor is mounted preferable at a location (e.g., interior surface of an outer fairing) that minimizes the influence of engine and exhaust heat and wind on ambient temperature readings. 
+  * The microcontroller is preferably mounted on an interior surface of a fairing or behind the LCD display. The LCD display is preferably mounted on the handlebars or handlebar clamp. 
+* Operational Workflow:
+  1. The outputs of the infrared temperature sensor and ambient temperature sensor are input into the Arduino microcontroller. 
+  2. The microcontroller outputs a first value and a second value to display on the LCD display. 
+     * The first value is the indicative of the surface temperature at which the infrared temperature sensor is directed. 
+     * The second value is indicative of the ambient temperature of the motorcycle’s current operating environment. 
+  3. The microcontroller calculates the first value (updates every 0.5 seconds). 
+     1. Filters out outlier samples that are either less than a reasonable minimum surface temperature threshold or greater than a maximum reasonable surface temperature threshold.
+     2. Applies exponential smoothing that gives weight to new infrared temperature sensor readings while retaining memory of past infrared temperature sensor readings. 
+  4. The microcontroller calculates the second value (updates every 1 second).
+     1. Filters out outlier samples that are either less than a reasonable minimum ambient temperature threshold or greater than a maximum reasonable ambient temperature threshold.
+     2. Applies exponential smoothing that gives weight to new ambient temperature readings while retaining memory of past ambient temperature readings. 
+  5. The microcontroller instructs the LCD display to present the first value. First value presented in one of: 
+     * **Red**: 90℉ ≤  first value
+       * Indicates tire grip at the contact patch is too low to maintain traction during countersteering or emergency braking.
+     * **Yellow**: 90℉ < first value ≤ 130℉ 
+       * Indicates conservative counter steering may be utilized, but high risk of traction loss at significant lean angles or abrupt emergency braking.
+     * **Green**: 130℉ < first value ≤ 185℉
+       * Indicates optimal surface temperature to maintain tire grip at the contact patch.
+     * **Red**: 185℉ < first value
+       * Indicates tire surface temperature rapidly approaching overheating at which tire grip at the contact patch is again reduced. 
+  6. The microcontroller instructs the LCD display to present the second value. Second value presented in one of: 
+     * **Red**: 40℉ ≤  second value
+       * Indicates ambient temperature is low enough that tire grip at the contact patch is significantly reduced and traction loss is highly likely at most lean angles.
+     * **Yellow**: 40℉ < second value ≤ 60℉ 
+       * Indicates ambient temperature is low enough to increase the likelihood of traction loss at significant lean angles.
+     * **Green**: 60℉ < second value ≤ 100℉
+       * Indicates optimal ambient temperature to maintain tire grip at the contact patch.
+     * **Red**: 100℉ < second value
+       * Indicates ambient temperature has reached a level high enough to cause air expansion inside the tires, which may reduce the size of the contact patch. 
 
 ## Hardware Assumptions
 
@@ -22,7 +56,7 @@ Arduino Nano Every and drives:
 Power the sensors according to their datasheets (5 V tolerant variants are
 recommended for the Nano Every).
 
-## Firmware Behavior
+## Firmware Logic
 
 - Samples both sensors every 100 ms.
 - Rejects samples outside configurable bounds before they ever affect the UI.
@@ -31,12 +65,12 @@ recommended for the Nano Every).
 - Colors follow the same thresholds used in the desktop prototype.
 - Draws two large text tiles on the LCD so the rider can glance at the status.
 
-Key logic lives in:
+Logic Highlights:
 
 - `SensorChannel` — filtering, smoothing, and update-period management.
 - `Display` — wraps an Adafruit ST77xx display over hardware SPI.
 - `src/main.cpp` — Arduino `setup/loop`, real sensor drivers, and thresholds.
-    - Smoothing constants and thresholds are configurable via `src/main.cpp` to fit
+  - Smoothing constants and thresholds are configurable via `src/main.cpp` to fit
   different tire compounds and environments. 
 
 ## Required Arduino Libraries
