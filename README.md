@@ -46,7 +46,7 @@ Arduino Nano Every and drives:
      * **Red**: 100℉ < second value
        * Indicates ambient temperature has reached a level high enough to cause air expansion inside the tires, which may reduce the size of the contact patch. 
 
-## Hardware Assumptions
+## Hardware Pin Configuration
 
 | Function              | Nano Every Pin | Peripheral Pin        |
 | --------------------- | -------------- | --------------------- |
@@ -58,17 +58,16 @@ Arduino Nano Every and drives:
 | LCD Data/Command      | D9             | Display DC            |
 | LCD Reset             | D8             | Display RST           |
 
-Power the sensors according to their datasheets (5 V tolerant variants are
-recommended for the Nano Every).
+Power: 5 V tolerant variants.
 
 ## Firmware Logic
 
 - Samples both sensors every 100 ms.
-- Rejects samples outside configurable bounds before they ever affect the UI.
-- Applies exponential smoothing to preserve short-term history.
+- Rejects samples outside configurable bounds.
+- Applies exponential smoothing to promote accurate outputs to the display.
 - Updates the tire line every 500 ms and the ambient line every 1000 ms.
-- Colors follow the same thresholds used in the desktop prototype.
 - Draws two large text tiles on the LCD so the rider can glance at the status.
+- Color outputs that follow thresholds to enhance readability.
 
 Logic Highlights:
 
@@ -80,25 +79,26 @@ Logic Highlights:
 
 ## Required Arduino Libraries
 
-Install these libraries through the Arduino IDE Library Manager or `arduino-cli
-lib install`:
+Required libraries (install via Arduino IDE Library Manager or `arduino-cli
+lib install`):
 
-- Adafruit MLX90614 Library
-- Adafruit BME280 Library (installs Adafruit Unified Sensor & BusIO as deps)
-- Adafruit GFX Library
-- Adafruit ST7735 and ST7789 Library
+- Adafruit MLX90614 
+- Adafruit BME280 (installs Adafruit Unified Sensor & BusIO as deps)
+- Adafruit GFX 
+- Adafruit ST7735 
+- Adafruit ST7789
 
 ## Building & Flashing
 
-1. Install the “Arduino megaAVR” board package and select **Arduino Nano Every**.
-2. Open this folder in the Arduino IDE _or_ use the CLI:
+1. Install “Arduino megaAVR” board package; select **Arduino Nano Every**.
+2. Open folder in the Arduino IDE _or_ use CLI:
 
    ```bash
    arduino-cli compile --fqbn arduino:megaavr:nona4809
    arduino-cli upload --fqbn arduino:megaavr:nona4809 -p /dev/ttyUSB0
    ```
 
-3. Open the Serial Monitor at 115200 baud to watch basic boot diagnostics.
+3. Open Serial Monitor at 115200 baud to observe basic boot diagnostics and confirm sensors and display are detected and initialized.
 
 The sketch initializes both sensors, paints the display once, and then refreshes
 any time one of the channels produces a new filtered value.
@@ -107,7 +107,7 @@ any time one of the channels produces a new filtered value.
 
 - If either sensor fails to initialize, the firmware halts and prints an error
   over Serial so the issue is obvious during bench testing.
-- The BME280 is probed at addresses `0x76` and `0x77`; adjustable via `src/main.cpp`
+- BME280 is probed at addresses `0x76` and `0x77`; adjustable via `src/main.cpp`
   for custom breakouts.
 
 ## License
