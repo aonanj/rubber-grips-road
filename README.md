@@ -1,28 +1,33 @@
 # Rubber Grips Road
 Embedded firmware for the Rubber Grips Road motorcycle accessory. The sketch targets the
 Arduino Nano Every and drives:
-- A MLX90614 infrared sensor for front-tire surface temperature (I²C on A4/A5).
+- A MLX90614 infrared (IR) sensor for front-tire surface temperature (I²C on A4/A5).
 - A BME280 for ambient temperature (shares the I²C bus).
 - An SPI color LCD (Adafruit ST77xx-compatible) showing color-coded status lines.
 
 ## Prototype Description
 * **Goal**: Provide a motorcycle operator with continuously updated information about tire surface temperature and lean angle safety. 
-* Accessory composed of 4 major components: (1) an infrared temperature sensor, (2) an ambient temperature sensor, (3) an Arduino microcontroller, (4) a color LCD display. 
-  * The infrared temperature sensor is mounted in a position proximate to the radiator guard, and directed to the front tire of the motorcycle in order to detect the surface temperature of the front tire. 
-  * The ambient temperature sensor is mounted preferable at a location (e.g., interior surface of an outer fairing) that minimizes the influence of engine and exhaust heat and wind on ambient temperature readings. 
-  * The microcontroller is preferably mounted on an interior surface of a fairing or behind the LCD display. The LCD display is preferably mounted on the handlebars or handlebar clamp. 
-* Operational Workflow:
-  1. The outputs of the infrared temperature sensor and ambient temperature sensor are input into the Arduino microcontroller. 
-  2. The microcontroller outputs a first value and a second value to display on the LCD display. 
-     * The first value is the indicative of the surface temperature at which the infrared temperature sensor is directed. 
+* Major components:
+  1. **IR temperature sensor**
+    * Directed to the front tire of the motorcycle in order to detect the surface temperature of the front tire. Suggested mounting locations: (1)radiator guard, (2) exterior surface of front-most outer fairing, (3) fork tube (if line-of-sight to tire surface), (4) exterior surface of cowl. 
+  2. **Ambient temperature sensor**
+    * Preferably mounted at a location (e.g., interior surface of an outer fairing) that minimizes the influence of engine and exhaust heat and wind on ambient temperature readings. 
+  3. **Microcontroller** (suggested: Arduino Nano Every)
+    * Preferably mounted on an interior surface of a fairing or behind the LCD display. 
+  4. **LCD display**
+    * Preferably mounted on the handlebars or handlebar clamp. 
+* **Operational Workflow**:
+  1. Outputs of the IR temperature sensor and ambient temperature sensor are input into the Arduino microcontroller. 
+  2. Microcontroller outputs a first value and a second value to display on the LCD display. 
+     * The first value is the indicative of the surface temperature at which the IR temperature sensor is directed. 
      * The second value is indicative of the ambient temperature of the motorcycle’s current operating environment. 
-  3. The microcontroller calculates the first value (updates every 0.5 seconds). 
+  3. Microcontroller calculates the first value (updates every 0.5 seconds). 
      1. Filters out outlier samples that are either less than a reasonable minimum surface temperature threshold or greater than a maximum reasonable surface temperature threshold.
-     2. Applies exponential smoothing that gives weight to new infrared temperature sensor readings while retaining memory of past infrared temperature sensor readings. 
-  4. The microcontroller calculates the second value (updates every 1 second).
+     2. Applies exponential smoothing that gives weight to new IR temperature sensor readings while retaining memory of past IR temperature sensor readings. 
+  4. Microcontroller calculates the second value (updates every 1 second).
      1. Filters out outlier samples that are either less than a reasonable minimum ambient temperature threshold or greater than a maximum reasonable ambient temperature threshold.
      2. Applies exponential smoothing that gives weight to new ambient temperature readings while retaining memory of past ambient temperature readings. 
-  5. The microcontroller instructs the LCD display to present the first value. First value presented in one of: 
+  5. Microcontroller instructs the LCD display to present the first value. First value presented in one of: 
      * **Red**: 90℉ ≤  first value
        * Indicates tire grip at the contact patch is too low to maintain traction during countersteering or emergency braking.
      * **Yellow**: 90℉ < first value ≤ 130℉ 
@@ -31,7 +36,7 @@ Arduino Nano Every and drives:
        * Indicates optimal surface temperature to maintain tire grip at the contact patch.
      * **Red**: 185℉ < first value
        * Indicates tire surface temperature rapidly approaching overheating at which tire grip at the contact patch is again reduced. 
-  6. The microcontroller instructs the LCD display to present the second value. Second value presented in one of: 
+  6. Microcontroller instructs the LCD display to present the second value. Second value presented in one of: 
      * **Red**: 40℉ ≤  second value
        * Indicates ambient temperature is low enough that tire grip at the contact patch is significantly reduced and traction loss is highly likely at most lean angles.
      * **Yellow**: 40℉ < second value ≤ 60℉ 
