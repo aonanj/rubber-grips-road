@@ -1,0 +1,50 @@
+# Build output
+/build/
+/cmake-build-*/
+/CMakeFiles/
+/CMakeScripts/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+Makefile
+compile_commands.json
+
+# Compiled artifacts
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.elf
+*.bin
+*.hex
+*.eep
+*.map
+*.uf2
+*.d
+*.su
+*.idb
+*.pdb
+*.dSYM/
+
+# Arduino/IDE cache
+/.arduino*/
+.arduino-build/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Editor/OS files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
