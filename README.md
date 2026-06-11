@@ -146,7 +146,7 @@ This repository is publicly viewable for portfolio purposes only. The code is pr
 Copyright © 2025 Phaethon Order LLC. All rights reserved.
 Contact [support@phaethon.llc](mailto:support@phaethon.llc) for licensing or reuse requests.
 
-*See* [LICENSE](LICENSE.md) governing this repository.
+*See* [LICENSE](LICENSE.md) for terms.
 
 ---
 
