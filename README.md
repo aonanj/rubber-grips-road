@@ -1,6 +1,6 @@
-# Rubber Grips Road
+# Contact Patch Temperature Sensor System (ConTemp)
 
-> Embedded firmware for the Rubber Grips Road motorcycle accessory. Targets Arduino Nano Every. This sketch drives:
+> Embedded firmware for the Contact Patch Temperature Sensor System (ConTemp) motorcycle accessory. Targets Arduino Nano Every. This sketch drives:
 > - A MLX90614 infrared (IR) sensor for front-tire surface temperature (I²C on A4/A5).
 > - A BME280 for ambient temperature (shares the I²C bus).
 > - An SPI color LCD (Adafruit ST77xx-compatible) showing color-coded status lines.

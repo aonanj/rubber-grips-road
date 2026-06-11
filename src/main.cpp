@@ -85,7 +85,7 @@ void setup() {
         delay(10);
     }
 
-    Serial.println(F("Rubber Grips Road - Nano Every"));
+    Serial.println(F("ConTemp - Nano Every"));
     Wire.begin();  // SDA=A4, SCL=A5 on the Nano Every
 
     if (!tireSensor.begin()) {
