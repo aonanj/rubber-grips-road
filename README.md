@@ -48,20 +48,20 @@ Provide a motorcycle operator with continuously updated information about tire s
     * **Red**: 90℉ ≤  first value
       - Indicates tire grip at the contact patch is too low to maintain traction during countersteering or emergency braking.
     * **Yellow**: 90℉ < first value ≤ 130℉ 
-      - Indicates conservative counter steering may be utilized, but high risk of traction loss at significant lean angles or abrupt emergency braking.
+      - Indicates conservative countersteering may be utilized, but increased risk of traction loss at significant lean angles or abrupt emergency braking.
     * **Green**: 130℉ < first value ≤ 185℉
       - Indicates optimal surface temperature to maintain tire grip at the contact patch.
     * **Red**: 185℉ < first value
-      - Indicates tire surface temperature rapidly approaching overheating at which tire grip at the contact patch is again reduced. 
+      - Indicates tire surface temperature at or near overheating state likely to cause reduced tire grip at the contact patch. 
 6. Microcontroller instructs the LCD display to display each value on ambient temp line in one of: 
     * **Red**: 40℉ ≤  second value
-      - Indicates ambient temperature is low enough that tire grip at the contact patch is significantly reduced and traction loss is highly likely at most lean angles.
+      - Indicates ambient temperature is low enough to reduce tire grip at the contact patch in most conditions.
     * **Yellow**: 40℉ < second value ≤ 60℉ 
-      - Indicates ambient temperature is low enough to increase the likelihood of traction loss at significant lean angles or abrupt emergency braking.
+      - Indicates ambient temperature is low enough tire grip at the contact patch may be reduced in some conditions.
     * **Green**: 60℉ < second value ≤ 100℉
       - Indicates optimal ambient temperature to maintain tire grip at the contact patch.
     * **Red**: 100℉ < second value
-      - Indicates ambient temperature has reached a level high enough to cause air expansion inside the tires, which may reduce the size of the contact patch. 
+      - Indicates ambient temperature is high enough to reduce tire grip at the contact patch in most conditions (high ambient temperature causes air expansion inside the tires). 
 
 ---
 
@@ -139,6 +139,17 @@ _refreshes display each time one of the channels produces a new filtered value._
   for custom breakouts.
 
 ---
+
+## v2+ Features (planned)
+
+1. User-configurable thresholds
+2. Single indicator of estimated tire grip, aggregates and weights samples from both input lines. 
+3. QC/accuracy mechanisms for IR temperature sensor. Data read from the IR sensor line is used to infer failures at IR sensor, display error message, end display indicating estimated tire grip. Failure inference based on one or more of:
+    1. # out of range samples within a time period exceeds a threshold;
+    2. Range between min and max samples within a time period exceeds a threshold;
+    3. Rate of change of samples within a time period is below a threshold (low rate of change may indicate obstruction at IR sensor);
+    4. Time since ride start and/or sample average at ride start (e.g., relative to current sample average);
+    5. Other data read from CAN-bus or OBD dongle (e.g., PSI, speed, DTC/ABS activation, etc.). 
 
 ## License
 
