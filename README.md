@@ -145,7 +145,7 @@ _refreshes display each time one of the channels produces a new filtered value._
 1. User-configurable thresholds
 2. Single indicator for estimated tire grip, aggregates and weights samples from both input lines. 
 3. QC/accuracy mechanisms for IR temperature sensor. Data read from the IR sensor line is used to infer failures at IR sensor, display error message, end display indicating estimated tire grip. Failure inference based on one or more of:
-    1. # out-of-range samples within a time period exceeds a threshold;
+    1. Out-of-range samples within a time period exceeds a threshold;
     2. Range between min and max samples within a time period exceeds a threshold;
     3. Rate of change / variability of samples within a time period is below a threshold (low rate of change may indicate obstruction at IR sensor);
     4. Sample average at time _t1_ (e.g., ride start) relative to sample average at time _t2_ (e.g., most recent);
