@@ -24,7 +24,7 @@ Provide a motorcycle operator with continuously updated information about tire s
 3. **Ambient temperature sensor**
     * Preferably mounted at a location that minimizes the influence of engine and exhaust heat and wind on ambient temperature readings. Suggested mounting locations: (1) interior surface of an outer fairing, (2) underside of seat (if sufficient distance from exhaust system/muffler), (3) subframe proximate to rear suspension.  
 3. **Microcontroller** 
-    * Arduino Nano Every recommended due to form factor.
+    * Arduino Nano Every recommended for smaller form factor.
     * Preferably mounted on an interior surface of a fairing or behind the LCD display. 
 4. **LCD display**
     * Preferably mounted on the handlebars, handlebar clamp, or steering stem nut. 
@@ -37,14 +37,22 @@ Provide a motorcycle operator with continuously updated information about tire s
 2. Microcontroller calculates and outputs values on a tire temp line and an ambient temp line to display on the LCD display. 
     * Tire temp line: carries values indicative of the temperature at the surface to which the IR temperature sensor is directed (i.e., front-tire surface temperature). 
     * Ambient temp line: carries values indicative of the ambient temperature of the motorcycle’s current operating environment. 
-3. Microcontroller calculates values for tire temp line every 500ms. 
-    * Filters out outlier samples from IR temp sensor that are either less than a reasonable minimum surface temperature threshold or greater than a maximum reasonable surface temperature threshold.
-    * Applies exponential smoothing that gives weight to new IR temperature sensor samples while retaining memory of past IR temperature sensor samples within a first sampling window. 
-4. Microcontroller calculates values for ambient temp line every 1000ms.
-    * Filters out outlier samples from ambient temp sensor that are either less than a reasonable minimum ambient temperature threshold or greater than a maximum reasonable ambient temperature threshold.
-    * Applies exponential smoothing that gives weight to new ambient temperature sensor samples while retaining memory of past ambient temperature sensor samples within a second sampling window.
-    * Microcontroller staggers updates on tire temp line from updates on ambient temp line. 
-5. Microcontroller instructs the LCD display to display each value on tire temp line in one of: 
+3. Microcontroller calculates primary display value corresponding to (approximate) tire surface temperature based on multiple samples received on the IR sensor ("tire temp") line.
+    * Primary display value refreshed at 500ms intervals.
+    * Primary display value derived based on:
+       1. Passthrough filter applied to each sample received on IR temp sensor line. Samples not within a reasonable range are discarded.
+       2. Samples are timestamped on arrival, discarded when stale or replaced by fresh sample.
+       3. Samples within a window are assigned respective weights based on corresponding timestamps.
+       4. Exponential smoothing algorithm using weighted samples within the window applied so primary display value is gradually updated as tire surface temp meaningfully changes.
+4. Microcontroller calculates secondary display value corresponding to (approximate) ambient temperature based on multiple samples received on the ambient temp line.
+    * Secondary display value refreshed at 1000ms intervals.
+    * Secondary display value derived based on:
+       1. Passthrough filter applied to each sample received on ambient temp line. Samples not within a reasonable range are discarded.
+       2. Samples are timestamped on arrival, discarded when stale or replaced by fresh sample.
+       3. Samples within a window are assigned respective weights based on corresponding timestamps.
+       4. Exponential smoothing algorithm using weighted samples within the window applied so secondary display value is updated when ambient temp meaningfully changes.
+5. Microcontroller staggers updates to primary display value and secondary display value. 
+6. Microcontroller instructs the LCD display to display primary value corresponding to tire temp line in one of: 
     * **Red**: 90℉ ≤  first value
       - Indicates tire grip at the contact patch is too low to maintain traction during countersteering or emergency braking.
     * **Yellow**: 90℉ < first value ≤ 130℉ 
@@ -53,7 +61,7 @@ Provide a motorcycle operator with continuously updated information about tire s
       - Indicates optimal surface temperature to maintain tire grip at the contact patch.
     * **Red**: 185℉ < first value
       - Indicates tire surface temperature at or near overheating state likely to cause reduced tire grip at the contact patch. 
-6. Microcontroller instructs the LCD display to display each value on ambient temp line in one of: 
+7. Microcontroller instructs the LCD display to display secondary value corresponding to ambient temp line in one of: 
     * **Red**: 40℉ ≤  second value
       - Indicates ambient temperature is low enough to reduce tire grip at the contact patch in most conditions.
     * **Yellow**: 40℉ < second value ≤ 60℉ 
@@ -95,9 +103,11 @@ Power: 5 V tolerant variants.
 
 - Samples both sensors every 100 ms.
 - Rejects samples outside configurable bounds.
-- Applies exponential smoothing to promote accurate outputs to the display.
+- Applies exponential smoothing to improve accuracy of displayed values. 
 - Updates the tire temp line every 500 ms and the ambient temp line every 1000 ms.
-- Draws two large text tiles on the LCD so the rider can quickly glance at the status.
+- Draws two visually distinct text tiles on the LCD so the rider can quickly glance at the status:
+   - Large (primary) text tile displays data from tire temp line. Displayed above static "Tire Temp" label.
+   - Smaller (50%) text tile displays data from ambient temp line (ambient temp intended only as a supplement to tire temp). Displayed above static "Ambient" label.
 - Color outputs that follow thresholds to enhance readability.
 
 ---
@@ -144,12 +154,7 @@ _refreshes display each time one of the channels produces a new filtered value._
 
 1. User-configurable thresholds
 2. Single indicator for estimated tire grip, aggregates and weights samples from both input lines. 
-3. QC/accuracy mechanisms for IR temperature sensor. Data read from the IR sensor line is used to infer failures at IR sensor, display error message, end display indicating estimated tire grip. Failure inference based on one or more of:
-    1. Out-of-range samples within a time period exceeds a threshold;
-    2. Range between min and max samples within a time period exceeds a threshold;
-    3. Rate of change / variability of samples within a time period is below a threshold (low rate of change may indicate obstruction at IR sensor);
-    4. Sample average at time _t1_ (e.g., ride start) relative to sample average at time _t2_ (e.g., most recent);
-    5. Other data read from CAN-bus or OBD dongle (e.g., PSI, speed, DTC/ABS activation, etc.). 
+3. Quality control/accuracy checks for IR temperature sensor so primary display value avoids presenting stale or inaccurate information.
 
 ## License
 
